@@ -1,0 +1,1 @@
+# Kata from: https://www.codurance.com/katalyst/sudoku-kata?utm_campaign=katalyst&utm_content=220265047&utm_medium=social&utm_source=linkedin&hss_channel=lcp-5389169
