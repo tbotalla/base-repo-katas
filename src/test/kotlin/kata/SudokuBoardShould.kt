@@ -8,7 +8,7 @@ import kotlin.math.sqrt
 class SudokuBoardShould {
     @Test
     fun `have rows`() {
-        val numbers = listOf(1, 2, 3, 4)
+        val numbers = getListOfNumbers()
         val sudokuBoard = SudokuBoard.newBoard(numbers)
 
         val rows: List<Row> = sudokuBoard.rows()
@@ -17,32 +17,22 @@ class SudokuBoardShould {
     }
 
     @Test
-    fun `allow to create a board from 4 elements with 2 rows`() {
-        val numbers = listOf(1, 2, 3, 4)
+    fun `allow to create a board from 16 elements with 4 rows`() {
+        val numbers = getListOfNumbers()
 
         val sudokuBoard = SudokuBoard.newBoard(numbers)
 
         assertNotNull(sudokuBoard)
-        assertEquals(2, sudokuBoard.rows().size)
+        assertEquals(4, sudokuBoard.rows().size)
     }
 
     @Test
     fun `throw an exception if the square root of the number of elements is not integer`() {
-        val numbers = listOf(1, 2, 3, 4, 5)
+        val numbers = getInvalidListOfNumbers()
 
         assertThrows(NotSquareBoardException::class.java) {
             SudokuBoard.newBoard(numbers)
         }
-    }
-
-    @Test
-    fun `allow to create a board from 9 elements with 3 rows`() {
-        val numbers = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
-
-        val sudokuBoard = SudokuBoard.newBoard(numbers)
-
-        assertNotNull(sudokuBoard)
-        assertEquals(3, sudokuBoard.rows().size)
     }
 
     @Test
@@ -56,15 +46,50 @@ class SudokuBoardShould {
 
     @Test
     fun `have the first two elements in the first row, and the next two elements in the second row when a board with 4 elements is created`() {
-        val numbers = listOf(1, 2, 3, 4)
+        val numbers = getListOfNumbers()
 
         val rows = SudokuBoard.newBoard(numbers).rows()
 
+        assertRows(numbers, rows)
+
+    }
+
+    @Test
+    fun `not have repeated numbers in a row`() {
+        val numbers = getListOfNumbers()
+
+        val rows = SudokuBoard.newBoard(numbers).rows()
+
+        for(row in rows) {
+            assertTrue(row.isValid())
+        }
+    }
+
+    private fun assertRows(numbers: List<Int>, rows: List<Row>) {
         assertEquals(numbers[0], rows[0].elements[0])
         assertEquals(numbers[1], rows[0].elements[1])
-        assertEquals(numbers[2], rows[1].elements[0])
-        assertEquals(numbers[3], rows[1].elements[1])
+        assertEquals(numbers[2], rows[0].elements[2])
+        assertEquals(numbers[3], rows[0].elements[3])
+
+        assertEquals(numbers[4], rows[1].elements[0])
+        assertEquals(numbers[5], rows[1].elements[1])
+        assertEquals(numbers[6], rows[1].elements[2])
+        assertEquals(numbers[7], rows[1].elements[3])
+
+        assertEquals(numbers[8], rows[2].elements[0])
+        assertEquals(numbers[9], rows[2].elements[1])
+        assertEquals(numbers[10], rows[2].elements[2])
+        assertEquals(numbers[11], rows[2].elements[3])
+
+        assertEquals(numbers[12], rows[3].elements[0])
+        assertEquals(numbers[13], rows[3].elements[1])
+        assertEquals(numbers[14], rows[3].elements[2])
+        assertEquals(numbers[15], rows[3].elements[3])
     }
+
+    private fun getListOfNumbers() = listOf(1, 2, 3, 4, 2, 3,4 ,1, 3, 4, 1, 2, 4, 1, 2, 3)
+    private fun getInvalidListOfNumbers() = listOf(1, 2, 3, 4, 2, 3, 4 ,1, 3, 4, 1, 2, 4, 1, 2, 3, 1)
+
 }
 
 class NotSquareBoardException : RuntimeException() {
@@ -122,5 +147,21 @@ class CannotBuildABoardWithNoElementsException : Throwable() {
 }
 
 class Row(val elements: List<Int>) {
+    fun isValid():  Boolean {
+        return elements.size == elements.distinct().size
+    }
+}
 
+class RowShould {
+    @Test
+    fun `return true if there are not repeated numbers`() {
+        val row = Row(listOf(1,2,3))
+        assertTrue(row.isValid())
+    }
+
+    @Test
+    fun `return false if there are repeated numbers`() {
+        val row = Row(listOf(1,2,2))
+        assertFalse(row.isValid())
+    }
 }
