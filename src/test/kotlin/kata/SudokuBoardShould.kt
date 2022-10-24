@@ -2,8 +2,6 @@ package kata
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import java.lang.RuntimeException
-import kotlin.math.sqrt
 
 class SudokuBoardShould {
     @Test
@@ -53,7 +51,7 @@ class SudokuBoardShould {
         assertRows(numbers, rows)
 
     }
-
+    
     @Test
     fun `not have repeated numbers in a row`() {
         val numbers = getListOfNumbers()
@@ -62,6 +60,17 @@ class SudokuBoardShould {
 
         for(row in rows) {
             assertTrue(row.isValid())
+        }
+    }
+
+    @Test
+    fun `not have repeated numbers in a column`() {
+        val numbers = getListOfNumbers()
+
+        val columns = SudokuBoard.newBoard(numbers).columns()
+
+        for(column in columns) {
+            assertTrue(column.isValid())
         }
     }
 
@@ -87,81 +96,8 @@ class SudokuBoardShould {
         assertEquals(numbers[15], rows[3].elements[3])
     }
 
-    private fun getListOfNumbers() = listOf(1, 2, 3, 4, 2, 3,4 ,1, 3, 4, 1, 2, 4, 1, 2, 3)
+    private fun getListOfNumbers() = listOf(1, 2, 3, 4, 2, 3, 4 ,1, 3, 4, 1, 2, 4, 1, 2, 3)
     private fun getInvalidListOfNumbers() = listOf(1, 2, 3, 4, 2, 3, 4 ,1, 3, 4, 1, 2, 4, 1, 2, 3, 1)
 
 }
 
-class NotSquareBoardException : RuntimeException() {
-
-}
-
-
-class SudokuBoard private constructor(numbers: List<Int>) {
-
-    private var rows: MutableList<Row> = mutableListOf()
-    private var n = 0
-
-    init {
-        validateNumbersNotEmpty(numbers)
-        val squareRootOfNumbers = sqrt(numbers.size.toDouble())
-        validateBoardSquare(squareRootOfNumbers)
-        n = squareRootOfNumbers.toInt()
-
-        addRows(numbers)
-    }
-
-    private fun validateNumbersNotEmpty(numbers: List<Int>) {
-        if (numbers.isEmpty()) {
-            throw CannotBuildABoardWithNoElementsException()
-        }
-    }
-
-    private fun addRows(numbers: List<Int>) {
-        val rowsElements = numbers.chunked(n)
-        for (row in rowsElements) {
-            rows.add(Row(row))
-        }
-    }
-
-    private fun validateBoardSquare(squareRootOfNumbersSize: Double) {
-        if ((squareRootOfNumbersSize % 1) != 0.toDouble()) {
-            throw NotSquareBoardException()
-        }
-    }
-
-    fun rows(): List<Row> {
-        return rows
-    }
-
-    companion object {
-        fun newBoard(numbers: List<Int>): SudokuBoard {
-            return SudokuBoard(numbers)
-        }
-    }
-
-}
-
-class CannotBuildABoardWithNoElementsException : Throwable() {
-
-}
-
-class Row(val elements: List<Int>) {
-    fun isValid():  Boolean {
-        return elements.size == elements.distinct().size
-    }
-}
-
-class RowShould {
-    @Test
-    fun `return true if there are not repeated numbers`() {
-        val row = Row(listOf(1,2,3))
-        assertTrue(row.isValid())
-    }
-
-    @Test
-    fun `return false if there are repeated numbers`() {
-        val row = Row(listOf(1,2,2))
-        assertFalse(row.isValid())
-    }
-}
