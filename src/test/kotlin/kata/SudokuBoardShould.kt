@@ -1,14 +1,13 @@
 package kata
 
+import kata.domain.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import java.lang.RuntimeException
-import kotlin.math.sqrt
 
 class SudokuBoardShould {
     @Test
     fun `have rows`() {
-        val numbers = listOf(1, 2, 3, 4)
+        val numbers = listOf(1, 2, 1, 2)
         val sudokuBoard = SudokuBoard.newBoard(numbers)
 
         val rows: List<Row> = sudokuBoard.rows()
@@ -18,7 +17,7 @@ class SudokuBoardShould {
 
     @Test
     fun `allow to create a board from 4 elements with 2 rows`() {
-        val numbers = listOf(1, 2, 3, 4)
+        val numbers = listOf(1, 2, 1, 2)
 
         val sudokuBoard = SudokuBoard.newBoard(numbers)
 
@@ -28,7 +27,7 @@ class SudokuBoardShould {
 
     @Test
     fun `throw an exception if the square root of the number of elements is not integer`() {
-        val numbers = listOf(1, 2, 3, 4, 5)
+        val numbers = listOf(1, 2, 3, 1, 2)
 
         assertThrows(NotSquareBoardException::class.java) {
             SudokuBoard.newBoard(numbers)
@@ -37,7 +36,7 @@ class SudokuBoardShould {
 
     @Test
     fun `allow to create a board from 9 elements with 3 rows`() {
-        val numbers = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9)
+        val numbers = listOf(1, 2, 3, 1, 2, 3, 1, 2, 3)
 
         val sudokuBoard = SudokuBoard.newBoard(numbers)
 
@@ -56,7 +55,7 @@ class SudokuBoardShould {
 
     @Test
     fun `have the first two elements in the first row, and the next two elements in the second row when a board with 4 elements is created`() {
-        val numbers = listOf(1, 2, 3, 4)
+        val numbers = listOf(1, 2, 1, 2)
 
         val rows = SudokuBoard.newBoard(numbers).rows()
 
@@ -65,62 +64,22 @@ class SudokuBoardShould {
         assertEquals(numbers[2], rows[1].elements[0])
         assertEquals(numbers[3], rows[1].elements[1])
     }
-}
 
-class NotSquareBoardException : RuntimeException() {
+    @Test
+    fun `not allow to create a board when an element greater than number of rows`() {
+        val numbers = listOf(1, 2, 3, 4)
 
-}
-
-
-class SudokuBoard private constructor(numbers: List<Int>) {
-
-    private var rows: MutableList<Row> = mutableListOf()
-    private var n = 0
-
-    init {
-        validateNumbersNotEmpty(numbers)
-        val squareRootOfNumbers = sqrt(numbers.size.toDouble())
-        validateBoardSquare(squareRootOfNumbers)
-        n = squareRootOfNumbers.toInt()
-
-        addRows(numbers)
-    }
-
-    private fun validateNumbersNotEmpty(numbers: List<Int>) {
-        if (numbers.isEmpty()) {
-            throw CannotBuildABoardWithNoElementsException()
+        assertThrows(CannotBuildABoardWithAnInvalidElementValue::class.java) {
+            SudokuBoard.newBoard(numbers)
         }
     }
 
-    private fun addRows(numbers: List<Int>) {
-        val rowsElements = numbers.chunked(n)
-        for (row in rowsElements) {
-            rows.add(Row(row))
+    @Test
+    fun `not allow to create a board when an repeated element per row`() {
+        val numbers = listOf(1, 1, 1, 2)
+
+        assertThrows(CannotBuildABoardWithRepeatedElementInARow::class.java) {
+            SudokuBoard.newBoard(numbers)
         }
     }
-
-    private fun validateBoardSquare(squareRootOfNumbersSize: Double) {
-        if ((squareRootOfNumbersSize % 1) != 0.toDouble()) {
-            throw NotSquareBoardException()
-        }
-    }
-
-    fun rows(): List<Row> {
-        return rows
-    }
-
-    companion object {
-        fun newBoard(numbers: List<Int>): SudokuBoard {
-            return SudokuBoard(numbers)
-        }
-    }
-
-}
-
-class CannotBuildABoardWithNoElementsException : Throwable() {
-
-}
-
-class Row(val elements: List<Int>) {
-
 }
