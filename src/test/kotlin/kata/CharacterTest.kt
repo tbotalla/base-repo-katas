@@ -9,7 +9,7 @@ class CharacterTest {
     fun `a Character must be created with 1000 health, level 1 and alive`() {
         val aCharacter = Character()
 
-        assertEquals(Character.MAX_HEALTH, aCharacter.health)
+        assertEquals(Health.getMaxHealth(), aCharacter.health)
         assertEquals(1, aCharacter.level)
         assertTrue(aCharacter.isAlive())
     }
@@ -19,10 +19,11 @@ class CharacterTest {
         val aCharacter = Character()
         val anotherCharacter = Character()
         val damage = 50
+        val expectedHealth = Health(aCharacter.health.value - damage)
 
         aCharacter.damage(anotherCharacter, damage)
 
-        assertEquals(Character.MAX_HEALTH - damage, anotherCharacter.health)
+        assertEquals(expectedHealth, anotherCharacter.health)
     }
 
     @Test
@@ -31,23 +32,12 @@ class CharacterTest {
         val anotherCharacter = Character()
         val firstDamage = 50
         val secondDamage = 100
+        val expectedHealth = Health(aCharacter.health.value - firstDamage - secondDamage)
 
         aCharacter.damage(anotherCharacter, firstDamage)
         aCharacter.damage(anotherCharacter, secondDamage)
 
-        assertEquals(Character.MAX_HEALTH - firstDamage - secondDamage, anotherCharacter.health)
-    }
-
-    @Test
-    fun `a Character is dead with 0 health when damage exceeds the current health`() {
-        val aCharacter = Character()
-        val anotherCharacter = Character()
-        val damage = 1050
-
-        aCharacter.damage(anotherCharacter, damage)
-
-        assertEquals(0, anotherCharacter.health)
-        assertFalse(anotherCharacter.isAlive())
+        assertEquals(expectedHealth, anotherCharacter.health)
     }
 
     @Test
@@ -56,12 +46,13 @@ class CharacterTest {
         val damagedCharacter = Character()
         val healAmount = 50
         val damage = 100
+        val expectedHealth = Health(damagedCharacter.health.value - damage + healAmount)
 
         aCharacter.damage(damagedCharacter, damage)
         aCharacter.heal(damagedCharacter, healAmount)
 
         assertTrue(damagedCharacter.isAlive())
-        assertEquals(Character.MAX_HEALTH - damage + healAmount, damagedCharacter.health)
+        assertEquals(expectedHealth, damagedCharacter.health)
     }
 
     @Test
@@ -70,12 +61,13 @@ class CharacterTest {
         val damagedCharacter = Character()
         val healAmount = 50
         val damage = 1050
+        val expectedHealth = Health(Health.DEAD_HEALTH)
 
         aCharacter.damage(damagedCharacter, damage)
         aCharacter.heal(damagedCharacter, healAmount)
 
         assertFalse(damagedCharacter.isAlive())
-        assertEquals(Character.DEAD_HEALTH, damagedCharacter.health)
+        assertEquals(expectedHealth, damagedCharacter.health)
     }
 
     @Test
@@ -83,9 +75,10 @@ class CharacterTest {
         val aCharacter = Character()
         val healedCharacter = Character()
         val healAmount = 50
+        val expectedHealth = Health(Health.MAX_HEALTH)
 
         aCharacter.heal(healedCharacter, healAmount)
 
-        assertEquals(Character.MAX_HEALTH, healedCharacter.health)
+        assertEquals(expectedHealth, healedCharacter.health)
     }
 }
