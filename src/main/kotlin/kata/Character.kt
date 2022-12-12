@@ -14,11 +14,6 @@ class Character {
         if (characterToHeal.isAlive())
             characterToHeal.health = Health(characterToHeal.health.value + healAmount)
     }
-
-    companion object {
-        const val DEAD_HEALTH: Int = 0
-        const val MAX_HEALTH: Int = 1000
-    }
 }
 
 class Health(var value: Int) {
@@ -28,7 +23,7 @@ class Health(var value: Int) {
         if (value > MAX_HEALTH) value = MAX_HEALTH
     }
 
-    fun isAlive(): Boolean = value > Character.DEAD_HEALTH
+    fun isAlive(): Boolean = value > DEAD_HEALTH
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -37,8 +32,6 @@ class Health(var value: Int) {
 
         return value == other.value
     }
-
-
 
     companion object {
         @JvmStatic
